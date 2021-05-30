@@ -187,15 +187,6 @@ func reflectValue(values url.Values, val reflect.Value, scope string) error {
 			continue
 		}
 
-		if opts.Contains("tojson") {
-			b, err := json.Marshal(sv.Interface())
-			if err != nil {
-				return err
-			}
-			values.Add(name, string(b))
-			continue
-		}
-
 		if sv.Type().Implements(encoderType) {
 			// if sv is a nil pointer and the custom encoder is defined on a non-pointer
 			// method receiver, set sv to the zero value of the underlying type
@@ -216,6 +207,15 @@ func reflectValue(values url.Values, val reflect.Value, scope string) error {
 				break
 			}
 			sv = sv.Elem()
+		}
+
+		if opts.Contains("tojson") {
+			b, err := json.Marshal(sv.Interface())
+			if err != nil {
+				return err
+			}
+			values.Add(name, string(b))
+			continue
 		}
 
 		if sv.Kind() == reflect.Slice || sv.Kind() == reflect.Array {
