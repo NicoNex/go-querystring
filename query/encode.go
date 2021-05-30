@@ -22,6 +22,7 @@ package query
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"reflect"
@@ -183,6 +184,15 @@ func reflectValue(values url.Values, val reflect.Value, scope string) error {
 		}
 
 		if opts.Contains("omitempty") && isEmptyValue(sv) {
+			continue
+		}
+
+		if opts.Contains("tojson") {
+			b, err := json.Marshal(sv.Interface())
+			if err != nil {
+				return err
+			}
+			values.Add(name, string(b))
 			continue
 		}
 
